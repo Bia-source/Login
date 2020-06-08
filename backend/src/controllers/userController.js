@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const bcrypto = require('bcryptjs');
 
 module.exports = {
     async registrar(req,res) {
@@ -14,7 +15,20 @@ module.exports = {
            return res.status(400).send({ error: 'Falha no registro'});
         }
         
-    }
+    },
+
+    async Authenticate(req,res){
+       const { email, password } = req.body;
+       const user = await User.findOne({ email }).select('+password');
+       if(!user)
+          return res.status(400).send({ erro: 'Usuário não encontrado'});
+       
+       // verificando se a senha do usuario é a mesma salva no bd   
+       if(!await bcrypto.compare(password, user.password));  
+       return res.status(400).send({ erro: 'Usuário ou senha invalidos', user});
+ 
+     
+    },
 
 }
 
